@@ -1,6 +1,4 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
 
 # If not running interactively, don't do anything
 case $- in
@@ -8,34 +6,24 @@ case $- in
       *) return;;
 esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
+# ─── History ───
 HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
 shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=1000
 HISTFILESIZE=2000
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
+# ─── Shell options ───
 shopt -s checkwinsize
-
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
+# chroot label (Debian/Ubuntu)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# set a fancy prompt (non-color, unless we know we "want" color)
+# ─── Prompt ───
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
@@ -59,12 +47,8 @@ fi
 # Short dir + optional git branch (see file header in ps1_short_dir_git.sh)
 [ -f "$HOME/.config/bash/ps1_short_dir_git.sh" ] && . "$HOME/.config/bash/ps1_short_dir_git.sh"
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+# ─── Shared config (aliases, etc.) ───
+[ -f "$HOME/.config/shell/common.sh" ] && . "$HOME/.config/shell/common.sh"
 
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -84,74 +68,34 @@ alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# ─── Completion ───
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/wjb/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# ─── Conda (bash) ───
+__conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/wjb/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/wjb/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/miniconda3/etc/profile.d/conda.sh"
     else
-        export PATH="/home/wjb/miniconda3/bin:$PATH"
+        export PATH="$HOME/miniconda3/bin:$PATH"
     fi
 fi
 unset __conda_setup
-# <<< conda initialize <<<
 
-if [[ $- == *i* ]]
-then
+# ─── Key bindings (bash-specific) ───
+if [[ $- == *i* ]]; then
     bind '"\e[A": history-search-backward'
     bind '"\e[B": history-search-forward'
 fi
-
-function git_branch {
-   branch="`git branch 2>/dev/null | grep "^\*" | sed -e "s/^\*\ //"`"
-   if [ "${branch}" != "" ];then
-       if [ "${branch}" = "(no branch)" ];then
-           branch="(`git rev-parse --short HEAD`...)"
-       fi
-       echo " ($branch)"
-   fi
-}
-
-__audit_jerry_env() {
-    local leak_points=("$HOME/.nexis" "$HOME/.devpath-store" "$HOME/.cola")
-    local found_leaks=()
-
-    for p in "${leak_points[@]}"; do
-        [ -d "$p" ] && found_leaks+=("$p")
-    done
-
-    if [ ${#found_leaks[@]} -gt 0 ]; then
-        echo -e "\033[0;31m[!] SECURITY ALERT: External sync hooks detected!\033[0m"
-        echo -e "\033[0;31m[!] Detected: ${found_leaks[*]}\033[0m"
-        echo -e "\033[0;33m[?] Action: Run 'kill_hooks' to protect your private code.\033[0m"
-    else
-        echo -e "\033[0;32m[*] Workspace Integrity: CLEAN. No corporate hooks found.\033[0m"
-    fi
-}
-
-__audit_jerry_env
-
-conda activate jsbsim

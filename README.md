@@ -4,15 +4,20 @@
 
 ## 包含什么
 
-### Shell (`bash`)
+### Shell（bash + zsh 双支持）
 
-- **`.bashrc`** — 主 shell 配置
-  - 自定义 PS1 prompt（绿色用户名 + 蓝色目录 + 白色 git 分支）
-  - 上下箭头按前缀搜索历史（`history-search-backward/forward`）
-  - ls/grep 彩色输出、常用别名（`ll`、`la`、`l`）
-  - conda (miniconda3) 初始化
-  - `dotfiles` alias 用于管理本仓库
-- **`.config/bash/ps1_short_dir_git.sh`** — 独立可移植的 prompt 脚本
+通用配置抽到 `.config/shell/common.sh`，bash 和 zsh 各自 source 它。
+
+- **`.config/shell/common.sh`** — 共享配置（别名、彩色输出、dotfiles alias、conda 激活）
+- **`.bashrc`** — bash 专用（Linux 服务器）
+  - 自定义 PS1（通过 `ps1_short_dir_git.sh`）
+  - bash 补全、history-search 按键绑定
+  - conda `shell.bash` 初始化
+- **`.zshrc`** — zsh 专用（macOS）
+  - `vcs_info` 驱动的 prompt（绿色用户名 + 蓝色目录 + 白色 git 分支）
+  - zsh 补全、history-search 按键绑定
+  - conda `shell.zsh` 初始化
+- **`.config/bash/ps1_short_dir_git.sh`** — bash 独立 prompt 脚本
 - **`.profile`** — login shell 基础配置
 - **`.bash_logout`** — shell 退出清屏
 
