@@ -1,0 +1,45 @@
+---
+description: 代码风格 — 简洁直接，拒绝冗余防御
+alwaysApply: true
+---
+
+# 代码风格
+
+不要写给定类型/上下文中不可能出现的防御代码。让错误暴露而非掩盖。
+
+## 禁止的模式
+
+❌ 对已知非空值做 None 检查：
+```python
+name = user.get("name", None)
+if name is None:
+    return ""
+```
+✅ 直接用：
+```python
+name = user["name"]
+```
+
+❌ 无恢复逻辑的空 except：
+```python
+try:
+    result = process(data)
+except Exception:
+    result = []
+```
+✅ 让它崩，或带有意义的处理：
+```python
+result = process(data)
+```
+
+❌ 一行逻辑拆成多个中间变量：
+```python
+items = get_items()
+filtered = [x for x in items if x.active]
+count = len(filtered)
+return count
+```
+✅ 直接表达意图：
+```python
+return sum(1 for x in get_items() if x.active)
+```

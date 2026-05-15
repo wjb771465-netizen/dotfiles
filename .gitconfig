@@ -1,0 +1,33 @@
+[user]
+    name = WangJunbo
+    email = wjb771465@gmail.com
+
+[core]
+    editor = code --wait
+    autocrlf = input
+
+[alias]
+    br = branch
+    co = checkout
+    df = diff
+    cp = cherry-pick
+    cmm = commit -m
+    cmd = commit --amend
+    st = status
+    rh = reset --hard
+    rmx = reset --mixed    
+    rb = rebase
+    rbi = rebase -i
+    rbc = rebase --continue
+    lg = log --graph --abbrev-commit --decorate --date=format:'%Y-%m-%d %H:%M' --pretty=format:'%C(yellow)%h%Creset %C(green)%an%Creset %C(blue)%ad%Creset %C(bold)%s%Creset %C(red)%d%Creset' -5
+    lg1 = log --graph --abbrev-commit --decorate --date=iso --pretty=format:'%C(yellow)%h%Creset %C(green)%an%Creset %C(blue)%ad%Creset %C(bold)%s%Creset %C(red)%d%Creset' -1
+    lgf = log --graph --date=iso --pretty=format:'%C(yellow)%h%Creset %C(green)%an%Creset %C(blue)%ad%Creset %C(bold)%s%Creset %C(red)%d%Creset'
+
+[credential]
+    helper = store
+
+[push]
+    default = simple
+
+[pull]
+    rebase = true

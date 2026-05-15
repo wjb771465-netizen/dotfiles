@@ -1,0 +1,105 @@
+---
+description: Git 提交工作流
+alwaysApply: false
+---
+
+## 路由与覆盖优先级（先读）
+
+在执行本规则前，先定位当前操作仓库根目录并检查固定路径：
+
+```bash
+git rev-parse --show-toplevel
+```
+
+若 `<repo_root>/.cursor/agent.md` 存在：
+
+- 先按该文件的仓库特定要求执行（作为仓库索引）。
+- 与本文件冲突的项，以仓库特定要求为准（仅覆盖冲突项）。
+- 本文件其余未冲突步骤继续生效。
+
+若该文件不存在：完全按本文件执行。
+
+---
+
+## 一段式执行，无需用户确认
+
+除非遇到**风险情形**（见下），否则在同一段流程内完成所有步骤，不要打断询问。
+
+---
+
+## 步骤
+
+### 1. 确定范围
+
+- 用户**指定范围**（文件、目录、功能）→ 仅对该范围执行 `git add`；范围外改动不纳入，在输出中简列「未纳入原因」。
+- 用户**未指定范围** → 默认本次会话相关改动（用 `git status` + `git diff --stat` 确认文件列表，不跑全量 `git diff`）。
+
+### 2. 仓库状态
+
+```bash
+git status
+git diff --stat HEAD
+```
+
+读 stat 输出确认拟提交文件。commit message 的"why"从会话记忆中取，不需要全量 diff。
+
+### 3. 分支检查
+
+```bash
+git branch --show-current
+```
+
+- 若当前在 `main` 或 `master`：自动从 HEAD 拉新分支再操作。
+  - 分支名由改动内容推断，格式 `<type>/<short-slug>`，例如 `feat/mappo-transformer`。
+  - `git checkout -b <branch-name>`
+  - 若仓库特定规则显式允许在 `main`/`master` 直接提交，则跳过拉分支步骤。
+
+### 4. 暂存
+
+```bash
+git add <范围内文件>
+```
+
+### 5. 提交
+
+Conventional Commits 格式，subject/body 均为**英文**：
+
+```
+<type>(<scope>): <imperative summary, ≤72 chars>
+
+[optional body: why, not what]
+```
+
+常用 type：`feat` `fix` `refactor` `test` `docs` `chore`
+
+示例：
+```
+feat(mappo): add transformer/GRU/MLP hot-swap backbone
+```
+
+```bash
+git commit -m "$(cat <<'EOF'
+<message>
+EOF
+)"
+```
+
+### 6. Push（自动执行）
+
+```bash
+git push -u origin <branch>
+```
+
+若当前已在非保护分支上：`git push origin HEAD`。
+
+**禁止** `git push --force` 到 `main`/`master`。
+
+---
+
+## 风险情形——此时才暂停说明
+
+- 疑似密钥、凭据、大二进制文件被纳入
+- 明显破坏性改动（删分支、重写历史）
+- 拆成多 commit 与合并成一个均有合理理由且用户无偏好
+
+出现以上任一情形时，输出说明并等待用户指令，不要强行推进。
