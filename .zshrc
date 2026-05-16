@@ -40,3 +40,4 @@ unset __conda_setup
 
 # macOS bash deprecation warning 静默（如果从 bash profile 转过来）
 export BASH_SILENCE_DEPRECATION_WARNING=1
+export PATH="$HOME/.local/bin:$PATH"
