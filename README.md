@@ -36,47 +36,57 @@
 - **`.cursor/rules/agent-interaction.mdc`** — AI 交互协议：遇矛盾时停止报告
 - **`.cursor/rules/git-commit.mdc`** — Git 提交工作流：Conventional Commits、分支保护
 
+### Claude Code
+
+- **`.claude/settings.json`** — CC 通用配置（theme 等）
+
+私人技能（如 `~/.claude/skills/Ruby/`）存放在独立的私有 repo `dotfiles-private`，通过 `install.sh` 可选安装，不进入此 repo。
+
 ## 新设备安装
 
-### 1. 克隆
+### 快速安装（推荐）
 
 ```bash
 git clone --bare git@github.com:wjb771465-netizen/dotfiles.git $HOME/.dotfiles
+bash $HOME/.dotfiles/install.sh   # 会询问是否安装私人配置
 ```
 
-### 2. 定义 alias
+> `install.sh` 自动处理冲突备份、alias 设置、隐藏未跟踪文件，末尾可选安装私人配置（Ruby 等）。
+
+### 手动安装
+
+<details>
+<summary>展开手动步骤</summary>
 
 ```bash
+# 1. 克隆
+git clone --bare git@github.com:wjb771465-netizen/dotfiles.git $HOME/.dotfiles
+
+# 2. 临时 alias
 alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-```
 
-### 3. Checkout
-
-```bash
-dotfiles checkout
-```
-
-如果新机器上已有默认配置文件（`.bashrc` 等）导致冲突，先备份再重试：
-
-```bash
+# 3. 备份冲突文件后 checkout
 mkdir -p $HOME/.dotfiles-backup
-dotfiles checkout 2>&1 | grep -oP '(?<=\t).*' | xargs -I{} sh -c 'mkdir -p "$HOME/.dotfiles-backup/$(dirname "{}")" && mv "$HOME/{}" "$HOME/.dotfiles-backup/{}"'
+dotfiles checkout 2>&1 | awk '/^\t/{print $1}' | while IFS= read -r f; do
+  mkdir -p "$HOME/.dotfiles-backup/$(dirname "$f")" && mv "$HOME/$f" "$HOME/.dotfiles-backup/$f"
+done
 dotfiles checkout
-```
 
-### 4. 隐藏未跟踪文件
-
-```bash
+# 4. 隐藏未跟踪文件
 dotfiles config --local status.showUntrackedFiles no
+
+# 5. 生效
+source ~/.zshrc   # macOS
+# source ~/.bashrc  # Linux
 ```
 
-### 5. 完成
+</details>
 
-`source ~/.bashrc`，所有配置即刻生效。之后用 `dotfiles` 命令管理：
+### 日常管理
 
 ```bash
 dotfiles status
-dotfiles add ~/.bashrc
-dotfiles commit -m "update bashrc"
+dotfiles add ~/.claude/settings.json
+dotfiles commit -m "update cc settings"
 dotfiles push
 ```
