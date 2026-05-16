@@ -45,6 +45,15 @@ case "$yn" in
     PRIV="git --git-dir=$HOME/.dotfiles-private --work-tree=$HOME"
     $PRIV checkout 2>/dev/null || true
     $PRIV config --local status.showUntrackedFiles no
+
+    # Adapt hardcoded /Users/wjb paths to actual $HOME
+    if [ "$HOME" != "/Users/wjb" ]; then
+      echo "    Adapting paths in Ruby prompts to $HOME..."
+      find "$HOME/.claude/skills/Ruby/prompts" "$HOME/.claude/skills/Ruby/SKILL.md" \
+        -type f -name "*.md" | xargs sed -i.bak "s|/Users/wjb|$HOME|g"
+      find "$HOME/.claude/skills/Ruby" -name "*.bak" -delete
+    fi
+
     echo "==> Private config ready."
     ;;
   *)
