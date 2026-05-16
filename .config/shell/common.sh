@@ -7,6 +7,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles-private='git --git-dir=$HOME/.dotfiles-private/ --work-tree=$HOME'
 
 # ls/grep 彩色输出（跨平台）
 if command -v dircolors &>/dev/null; then
