@@ -47,6 +47,9 @@ export PATH="/opt/homebrew/bin:$PATH"
 export HOMEBREW_RUBY_PATH=/usr/bin/ruby
 export HOMEBREW_NO_AUTO_UPDATE=1
 
+# ─── API Keys ───
+export SILICONFLOW_API_KEY=$(security find-generic-password -s "SILICONFLOW_API_KEY" -a "$USER" -w 2>/dev/null)
+
 # ─── Proxy ───
 # 代理工具（梯子）本地监听端口；HTTP/HTTPS 走 6004，SOCKS5 同端口
 export HTTP_PROXY=http://127.0.0.1:6004
