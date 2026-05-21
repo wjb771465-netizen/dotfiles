@@ -17,6 +17,8 @@
   - `vcs_info` 驱动的 prompt（绿色用户名 + 蓝色目录 + 白色 git 分支）
   - zsh 补全、history-search 按键绑定
   - conda `shell.zsh` 初始化
+  - Homebrew PATH（`/opt/homebrew/bin`，macOS 专用）
+  - 代理环境变量（HTTP/SOCKS5，本地端口 6004）
 - **`.config/bash/ps1_short_dir_git.sh`** — bash 独立 prompt 脚本
 - **`.profile`** — login shell 基础配置
 - **`.bash_logout`** — shell 退出清屏
@@ -39,6 +41,8 @@
 ### Claude Code
 
 - **`.claude/settings.json`** — CC 通用配置（theme 等）
+- **`.claude/skills/context/`** — `/context` 技能：自动生成/更新 CLAUDE.md 和 README.md
+- **`.claude/skills/git-commit-push/`** — `/git-commit-push` 技能：conventional commit 生成 + 推送
 
 私人技能（如 `~/.claude/skills/Ruby/`）存放在独立的私有 repo `dotfiles-private`，通过 `install.sh` 可选安装，不进入此 repo。
 

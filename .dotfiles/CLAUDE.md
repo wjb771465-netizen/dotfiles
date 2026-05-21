@@ -19,6 +19,8 @@
 | `~/.cursor/rules/agent-interaction.mdc` | Cursor AI 交互协议 |
 | `~/.cursor/rules/git-commit.mdc` | Cursor git 提交工作流规则 |
 | `~/.claude/settings.json` | Claude Code 通用配置 |
+| `~/.claude/skills/context/` | context 技能（含 agent-layer 和 readme-layer prompts） |
+| `~/.claude/skills/git-commit-push/` | git-commit-push 技能（conventional commit 生成 + 推送） |
 
 ## Rules
 - 日常管理用 `dotfiles` alias（= `git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME`）
