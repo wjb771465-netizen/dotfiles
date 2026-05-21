@@ -41,3 +41,15 @@ unset __conda_setup
 # macOS bash deprecation warning 静默（如果从 bash profile 转过来）
 export BASH_SILENCE_DEPRECATION_WARNING=1
 export PATH="$HOME/.local/bin:$PATH"
+
+# ─── Homebrew ───
+export PATH="/opt/homebrew/bin:$PATH"
+export HOMEBREW_RUBY_PATH=/usr/bin/ruby
+export HOMEBREW_NO_AUTO_UPDATE=1
+
+# ─── Proxy ───
+# 代理工具（梯子）本地监听端口；HTTP/HTTPS 走 6004，SOCKS5 同端口
+export HTTP_PROXY=http://127.0.0.1:6004
+export HTTPS_PROXY=http://127.0.0.1:6004
+export ALL_PROXY=socks5://127.0.0.1:6004
+export NO_PROXY=localhost,127.0.0.1,*.local
