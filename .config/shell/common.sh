@@ -20,6 +20,9 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
+# ─── API Keys (via pass) ───
+source ~/.config/shell/keys.sh
+
 # ─── Conda ───
 # 各 shell 的 conda init 块不同（bash vs zsh），留在各自 rc 文件中。
 # 这里只做通用的环境激活。
