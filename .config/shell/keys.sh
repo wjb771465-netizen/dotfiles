@@ -6,6 +6,8 @@ key() {
     openai)       pass show api/openai ;;
     github)       pass show api/github ;;
     anthropic)    pass show api/anthropic ;;
+    deepseek)     pass show api/deepseek ;;
+    siliconflow)  pass show api/siliconflow ;;
     *) echo "unknown key: $1" >&2; return 1 ;;
   esac
 }

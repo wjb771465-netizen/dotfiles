@@ -53,6 +53,15 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # export HOMEBREW_RUBY_PATH=/usr/bin/ruby
 # export HOMEBREW_NO_AUTO_UPDATE=1
 
+# ─── Claude Code login mode ───
+# 默认走 Claude Code 官方 OAuth；注释掉本段 unset 可切回上面的 Anthropic 兼容 API 配置。
+unset ANTHROPIC_AUTH_TOKEN
+unset ANTHROPIC_BASE_URL
+unset ANTHROPIC_MODEL
+unset ANTHROPIC_DEFAULT_MODEL
+unset ANTHROPIC_DEFAULT_HAIKU_MODEL
+unset CLAUDE_CODE_SUBAGENT_MODEL
+
 # ─── Proxy ───
 # 代理工具（梯子）本地监听端口；HTTP/HTTPS 走 6004，SOCKS5 同端口
 # export HTTP_PROXY=http://127.0.0.1:6004
