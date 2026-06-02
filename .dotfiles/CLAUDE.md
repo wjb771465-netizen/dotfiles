@@ -21,12 +21,17 @@
 | `~/.claude/settings.json` | Claude Code 通用配置 |
 | `~/.claude/skills/context/` | context 技能（含 agent-layer 和 readme-layer prompts） |
 | `~/.claude/skills/git-commit-push/` | git-commit-push 技能（conventional commit 生成 + 推送） |
+| `~/.config/shell/keys.sh` | `key()` 函数，通过 pass 取 API key |
+| `~/.password-store/` | GPG 加密的密钥仓库（pass，独立 git repo） |
+| `~/.config/pass/` | GPG 密钥备份（dotfiles-private 跟踪） |
+| `~/docs/pass-secrets-guide.md` | pass 密钥管理完整指南 |
 
 ## Rules
 - 日常管理用 `dotfiles` alias（= `git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME`）
 - 私有配置（`~/.dotfiles-private/`）独立管理，不进入此 repo
 - `git status` 默认隐藏未跟踪文件（`status.showUntrackedFiles no`）
 - 私人技能存放在 `~/.claude/skills/`，由 `dotfiles-private` 管理
+- **API 密钥管理**：使用 `pass` + `$(key <name>)` 取值，禁止在配置文件或对话中写明文 key。三个仓库分工见 `pass-secrets-guide.md`
 
 ## Tech Stack
 - Shell: bash（Linux）+ zsh（macOS）双栈
