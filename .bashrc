@@ -47,22 +47,8 @@ fi
 # Short dir + optional git branch (see file header in ps1_short_dir_git.sh)
 [ -f "$HOME/.config/bash/ps1_short_dir_git.sh" ] && . "$HOME/.config/bash/ps1_short_dir_git.sh"
 
-# ─── Shared config (aliases, etc.) ───
+# ─── Shared config (aliases, PATH, keys, DeepSeek, NVM, etc.) ───
 [ -f "$HOME/.config/shell/common.sh" ] && . "$HOME/.config/shell/common.sh"
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
