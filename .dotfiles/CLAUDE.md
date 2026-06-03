@@ -33,6 +33,20 @@
 - 私人技能存放在 `~/.claude/skills/`，由 `dotfiles-private` 管理
 - **API 密钥管理**：使用 `pass` + `$(key <name>)` 取值，禁止在配置文件或对话中写明文 key。三个仓库分工见 `pass-secrets-guide.md`
 
+## Operational Constraints（bare repo 操作禁区）
+
+以下操作在 `$HOME` 工作区下会引发严重性能问题或卡死，**必须避免**：
+
+| 禁止操作 | 原因 | 替代方案 |
+|----------|------|---------|
+| `git stash --include-untracked` / `-u` | 会扫描整个 `$HOME` 下所有未跟踪文件，海量 pip/node 缓存导致卡死 | `git stash`（仅 tracked 文件），或直接 `git restore` 特定文件 |
+| `git add -A` / `git add .` 不加路径限制 | 同上，会遍历整个家目录 | 明确指定文件路径：`git add .config/shell/common.sh` |
+| `git clean -df` | 会递归删除 `$HOME` 下所有未跟踪文件，灾难性 | 永远不要执行 |
+
+此外：
+- `dotfiles` alias 在非交互式 shell（如 Claude Code 的 Bash 工具）中不可用——始终使用完整命令 `git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME`
+- pull 前如有本地改动，优先 `git restore` 特定文件，避免 stash 整个工作区
+
 ## Tech Stack
 - Shell: bash（Linux）+ zsh（macOS）双栈
 - 包管理: conda（miniconda3），默认激活 `jsbsim` 环境
