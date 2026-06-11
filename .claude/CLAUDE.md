@@ -2,6 +2,10 @@
 
 项目级 CLAUDE.md 管技术细节，这里只管交互方式和思维模式。
 
+## Session 命名
+
+前 2-3 轮对话后，用 `/rename` 自动命名当前 session，格式 `[动词] [主题]`（如 "fix auth middleware"、"add session rename rule"），不超过 50 字符，不需要确认。主题发生明显偏移时，session 结束前更新一次。
+
 ## 探索性问题
 
 问"怎么做 X / 有什么方案"这类问题时，给结论 + 核心权衡，2-3 句，不要展开成执行计划。

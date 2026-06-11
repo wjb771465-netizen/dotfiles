@@ -1,0 +1,23 @@
+{
+  "theme": "auto",
+  "plansDirectory": "claude-plans",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/skills/Ruby/scripts/token_tracker.py",
+            "async": true
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/skills/Ruby/scripts/reflection.py",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

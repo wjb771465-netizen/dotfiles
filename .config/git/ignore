@@ -45,3 +45,4 @@ env/
 .ipynb_checkpoints/
 
 **/.claude/settings.local.json
+claude-plans/
