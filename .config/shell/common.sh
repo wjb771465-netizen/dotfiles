@@ -63,11 +63,11 @@ unset ANTHROPIC_DEFAULT_HAIKU_MODEL
 unset CLAUDE_CODE_SUBAGENT_MODEL
 
 # ─── Proxy ───
-# 代理工具（梯子）本地监听端口；HTTP/HTTPS 走 6004，SOCKS5 同端口
-# export HTTP_PROXY=http://127.0.0.1:6004
-# export HTTPS_PROXY=http://127.0.0.1:6004
-# export ALL_PROXY=socks5://127.0.0.1:6004
-# export NO_PROXY=localhost,127.0.0.1,*.local
+# 代理工具（梯子）本地监听端口；HTTP/HTTPS 走 7892（小鸡快跑），SOCKS5 同端口
+export HTTP_PROXY=http://127.0.0.1:7892
+export HTTPS_PROXY=http://127.0.0.1:7892
+export ALL_PROXY=socks5://127.0.0.1:7892
+export NO_PROXY=localhost,127.0.0.1,*.local
 
 # ─── Conda ───
 # 各 shell 的 conda init 块不同（bash vs zsh），留在各自 rc 文件中。
