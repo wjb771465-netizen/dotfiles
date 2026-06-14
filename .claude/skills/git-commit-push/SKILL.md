@@ -23,7 +23,22 @@ git rev-parse --abbrev-ref HEAD
 
 If there are no changes (nothing staged, nothing modified), tell the user and stop.
 
-### Step 2 — Stage changes
+### Step 2 — Run tests
+
+Before staging anything, discover the test command:
+
+1. **Check docs first**: look in any project documentation files (e.g. `CLAUDE.md`, `README.md`, `README`, `CONTRIBUTING.md`) for a test command explicitly mentioned (e.g. "run `make test`", "tests: `pytest`").
+2. **Fall back to project files**: if docs don't mention one, look for `Makefile` (`test` target), `package.json` (`test` script), `pytest.ini` / `pyproject.toml`, `Cargo.toml`, etc.
+
+Run whatever command is found:
+
+```bash
+make test   # or: npm test / pytest / cargo test / etc.
+```
+
+If tests fail, **stop and report the failure** — do not proceed to commit. If no test command is found anywhere, skip silently.
+
+### Step 3 — Stage changes
 
 If there are unstaged changes but nothing staged, stage all tracked modifications:
 
@@ -33,7 +48,7 @@ git add -u
 
 For new (untracked) files, ask the user which files to include.
 
-### Step 3 — Generate commit message
+### Step 4 — Generate commit message
 
 Analyze the diff (`git diff --cached`) and produce a message following this format:
 
@@ -76,7 +91,7 @@ add: freespace eval task with dataloader, metric, and dashboard
 refactor: replace inline handlers with dashboard registry pattern
 ```
 
-### Step 4 — Commit
+### Step 5 — Commit
 
 Present the proposed message to the user for confirmation. Then commit:
 
@@ -84,7 +99,7 @@ Present the proposed message to the user for confirmation. Then commit:
 git commit -m "<message>"
 ```
 
-### Step 5 — Push safety checks
+### Step 6 — Push safety checks
 
 Before pushing, check the branch state:
 
@@ -100,7 +115,7 @@ git rev-list --count --left-right HEAD...@{upstream} 2>/dev/null
 | Branch has diverged (rebase happened) | **Warn the user**: "分支已与远程分叉（可能因为 rebase），需要 force push。是否继续？" Only `git push --force-with-lease` after explicit confirmation |
 | Upstream is ahead (remote has new commits) | **Warn the user**: "远程分支有新提交，建议先 `git pull --rebase` 再推送" |
 
-### Step 6 — Report
+### Step 7 — Report
 
 After push succeeds, show:
 - The commit hash and message

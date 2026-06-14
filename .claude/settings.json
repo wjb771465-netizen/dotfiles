@@ -1,7 +1,30 @@
 {
   "theme": "auto",
+  "permissions": {
+    "allow": [
+      "mcp__hub__hub_reply",
+      "mcp__hub__hub_send_file",
+      "mcp__hub__hub_replay_history",
+      "Read(~/.claude/skills/**)",
+      "Read(~/Workspace/**)",
+      "Read(~/.forge-hub/**)",
+      "Bash(ls*)",
+      "Bash(find*)",
+      "Bash(grep*)",
+      "Bash(which*)",
+      "Bash(echo*)",
+      "Bash(cat*)"
+    ]
+  },
   "plansDirectory": "claude-plans",
   "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ~/.claude/hooks/pretooluse-guard.sh" }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",

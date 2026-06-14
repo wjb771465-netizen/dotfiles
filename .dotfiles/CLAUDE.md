@@ -44,8 +44,8 @@
 | `git clean -df` | 会递归删除 `$HOME` 下所有未跟踪文件，灾难性 | 永远不要执行 |
 
 此外：
-- `dotfiles` alias 在非交互式 shell（如 Claude Code 的 Bash 工具）中不可用——始终使用完整命令 `git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME`
-- pull 前如有本地改动，优先 `git restore` 特定文件，避免 stash 整个工作区
+- `dotfiles` alias 在非交互式 shell（如 Claude Code 的 Bash 工具）中不可用——始终使用完整命令。**必须先 `cd $HOME`**，否则 `git add`/`restore`/`diff` 等涉及 pathspec 的操作会从当前目录解析相对路径而失败。完整公式：`cd $HOME && git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME <subcommand>`
+- pull 前如有本地改动，优先 `git restore` 特定文件；但 bare repo 下 `restore` / `diff` / `ls-files` 可能因路径解析不一致而报不认识文件，此时 `git stash`（不带 `-u`）→ `pull` → `stash pop` 是可靠 fallback
 
 ## Tech Stack
 - Shell: bash（Linux）+ zsh（macOS）双栈

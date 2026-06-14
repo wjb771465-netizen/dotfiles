@@ -37,3 +37,4 @@ else
     fi
 fi
 unset __conda_setup
+export PATH="$HOME/bin:$PATH"
