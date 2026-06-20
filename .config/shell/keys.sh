@@ -8,6 +8,7 @@ key() {
     anthropic)    pass show api/anthropic ;;
     deepseek)     pass show api/deepseek ;;
     siliconflow)  pass show api/siliconflow ;;
+    kimi)         pass show api/kimi ;;
     *) echo "unknown key: $1" >&2; return 1 ;;
   esac
 }
