@@ -36,13 +36,17 @@
 
 - **`.cursor/rules/coding-style.mdc`** — 代码风格：禁止冗余防御代码、空 except、过多中间变量
 - **`.cursor/rules/agent-interaction.mdc`** — AI 交互协议：遇矛盾时停止报告
-- **`.cursor/rules/git-commit.mdc`** — Git 提交工作流：Conventional Commits、分支保护
+- **`.cursor/rules/workflow-prefs.mdc`** — 探索问答、Plan、改动范围、完成标准；提交走 git-commit-push skill
+- **`.cursor/permissions.json`** — Agent 终端/MCP 白名单 + Auto-review 倾向（Settings → Agents → Approvals & Execution 需开启 Run Mode）
+
+Cursor 也会从 `~/.claude/skills/` 加载 Skills（与 Claude Code 共用，无需复制到 `~/.cursor/skills/`）。
 
 ### Claude Code
 
-- **`.claude/settings.json`** — CC 通用配置（theme 等）
+- **`.claude/settings.json`** — CC 通用配置（theme、hooks 等）
+- **`.claude/CLAUDE.md`** — CC 用户级偏好（Cursor 不自动加载此文件；对应内容在 `workflow-prefs.mdc`）
 - **`.claude/skills/context/`** — `/context` 技能：自动生成/更新 CLAUDE.md 和 README.md
-- **`.claude/skills/git-commit-push/`** — `/git-commit-push` 技能：conventional commit 生成 + 推送
+- **`.claude/skills/git-commit-push/`** — 提交/推送技能（Cursor 与 CC 共用）
 
 私人技能（如 `~/.claude/skills/Ruby/`）存放在独立的私有 repo `dotfiles-private`，通过 `install.sh` 可选安装，不进入此 repo。
 
