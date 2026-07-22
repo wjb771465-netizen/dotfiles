@@ -50,3 +50,10 @@ Plan 的目的是对齐思路，不是交付代码。
 
 遇到意外（测试挂、构建报错、行为不符）：停止加新功能，保留现场，先诊断再继续。
 破坏性操作（删文件、force push、hard reset）先确认，不自作主张。
+
+
+## Dotfiles 与密钥
+
+- **公开** `~/.dotfiles`：shell / git / 编辑器等通用配置（`dotfiles` alias）。
+- **私有** `~/.dotfiles-private`：技能、`keys.sh`、GPG 备份等（`dotfiles-private` alias）；可与公开仓分开安装。
+- **密钥**：密文在 `pass`（`~/.password-store`）；本机用 `$(key <name>)` 取值（`keys.sh` 存在时由 `common.sh` 自动 source）。无明文 key 写进配置或对话。完整说明见 `~/docs/pass-secrets-guide.md`。

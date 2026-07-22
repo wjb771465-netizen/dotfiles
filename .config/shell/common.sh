@@ -26,11 +26,8 @@ case ":$PATH:" in
   *) export PATH="$HOME/.local/bin:$PATH" ;;
 esac
 
-# ─── API Keys (via pass) ───
-source ~/.config/shell/keys.sh
-export SILICONFLOW_API_KEY=$(key siliconflow)
-export OPENAI_API_KEY=$SILICONFLOW_API_KEY
-export KIMI_API_KEY=$(key kimi)
+# ─── API Keys (via pass; optional — keys.sh lives in dotfiles-private) ───
+[[ -f ~/.config/shell/keys.sh ]] && source ~/.config/shell/keys.sh
 
 # ─── Claude Code provider switcher ───
 # 默认仍走官方 Claude；以下函数用于临时切换到其他 provider，
