@@ -61,6 +61,20 @@ case "$yn" in
     ;;
 esac
 
+# ─── Optional: Cursor MCP servers (not installed by this script) ──────────────
+#
+# ~/.cursor/mcp.json 已包含 zotero / officecli 两个 MCP server 配置，但依赖以下
+# 运行时组件，需要手动安装：
+#
+#   Zotero:   uv tool install zotero-mcp-server   # 提供 ~/.local/bin/zotero-mcp
+#             + dotfiles-private 的 keys.sh (pass api/zotero)
+#             + 本机 Zotero Desktop 需保持运行（ZOTERO_LOCAL=true）
+#             启动脚本 ~/.local/bin/zotero-mcp-hybrid 已随本仓库同步
+#
+#   Office:   npm i -g @officecli/officecli       # 需要先装好 nvm/node
+#
+# 装好后重启 Cursor 或重新加载 MCP 即可生效。
+
 # ─── Done ──────────────────────────────────────────────────────────────────────
 
 echo ""
