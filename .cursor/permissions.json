@@ -1,25 +1,4 @@
 {
-  "terminalAllowlist": [
-    "ls",
-    "find",
-    "grep",
-    "rg",
-    "which",
-    "echo",
-    "cat",
-    "head",
-    "tail",
-    "wc",
-    "git status",
-    "git diff",
-    "git log",
-    "git branch",
-    "git show",
-    "git rev-parse"
-  ],
-  "mcpAllowlist": [
-    "hub:*"
-  ],
   "autoRun": {
     "allow_instructions": [
       "Read-only filesystem and git inspection commands are fine to run without asking.",

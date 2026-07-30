@@ -17,6 +17,7 @@
       "WebFetch"
     ]
   },
+  "model": "haiku",
   "hooks": {
     "PreToolUse": [
       {
@@ -46,9 +47,10 @@
       }
     ]
   },
-  "plansDirectory": "claude-plans",
-  "theme": "auto",
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
-  }
+  },
+  "plansDirectory": "claude-plans",
+  "theme": "auto",
+  "tui": "fullscreen"
 }
