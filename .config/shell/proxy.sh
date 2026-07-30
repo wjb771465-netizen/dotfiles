@@ -3,10 +3,52 @@
 # Cursor IDE 的 http.proxy 设置；proxy auto 按端口是否在监听自动决定当前 shell。
 
 PROXY_PORT="${PROXY_PORT:-7892}"
+PROXY_LATENCY_URL="${PROXY_LATENCY_URL:-https://www.google.com/generate_204}"
+PROXY_LATENCY_FALLBACK_URL="${PROXY_LATENCY_FALLBACK_URL:-http://connectivitycheck.platform.hicloud.com/generate_204}"
+PROXY_LATENCY_TIMEOUT="${PROXY_LATENCY_TIMEOUT:-5}"
 _PROXY_CURSOR_SETTINGS="$HOME/Library/Application Support/Cursor/User/settings.json"
 
 _proxy_probe() {
     nc -z -w1 127.0.0.1 "$1" 2>/dev/null
+}
+
+# 对单个 URL 测 RTT；成功把秒数写进 _proxy_latency_secs，失败返回 curl 退出码。
+# 临时去掉 ALL_PROXY：同端口 socks5 会让 curl 优先走 SOCKS 并卡住。
+_proxy_curl_latency() {
+    _proxy_latency_secs=$(env -u ALL_PROXY -u all_proxy curl -o /dev/null -sS -w '%{time_total}' \
+        --connect-timeout "$PROXY_LATENCY_TIMEOUT" --max-time "$PROXY_LATENCY_TIMEOUT" \
+        "$1" 2>/dev/null) || return $?
+    [[ -n "$_proxy_latency_secs" ]]
+}
+
+# 先测外网（默认 Google），挂了再测国内（华为 connectivitycheck）排除墙干扰。
+_proxy_check_latency() {
+    local via="${HTTP_PROXY:-direct}" timeout="$PROXY_LATENCY_TIMEOUT"
+    local primary="$PROXY_LATENCY_URL" fallback="$PROXY_LATENCY_FALLBACK_URL"
+    local ec label
+
+    _proxy_curl_latency "$primary"
+    ec=$?
+    if (( ec == 0 )); then
+        awk -v s="$_proxy_latency_secs" -v via="$via" \
+            'BEGIN { printf "latency: %.0f ms [%s] (google)\n", s * 1000, via }'
+        return 0
+    fi
+    if (( ec == 28 )); then label="TIMEOUT (>${timeout}s)"; else label="FAIL (curl $ec)"; fi
+
+    _proxy_curl_latency "$fallback"
+    ec=$?
+    if (( ec == 0 )); then
+        awk -v s="$_proxy_latency_secs" -v via="$via" -v label="$label" \
+            'BEGIN { printf "latency: %s google; %.0f ms [%s] (cn fallback)\n", label, s * 1000, via }'
+        return 0
+    fi
+    if (( ec == 28 )); then
+        echo "latency: $label google; TIMEOUT (>${timeout}s) cn [$via]"
+    else
+        echo "latency: $label google; FAIL (curl $ec) cn [$via]"
+    fi
+    return 1
 }
 
 _proxy_shell_on() {
@@ -83,6 +125,7 @@ print('cursor http.proxySupport:', d.get('http.proxySupport', '<unset>'))
             else
                 echo "cursor settings.json: not found"
             fi
+            _proxy_check_latency
             ;;
         *)
             echo "usage: proxy {on|off|status|auto} [port]" >&2
