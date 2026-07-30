@@ -27,14 +27,5 @@ bindkey '^[[B' history-search-forward
 # ─── Completion ───
 autoload -Uz compinit && compinit
 
-# ─── Conda (zsh) ───
-__conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-# . "$HOME/miniconda3/etc/profile.d/conda.sh"  # commented out by conda initialize
-    fi
-fi
-unset __conda_setup
+# conda init 已改为 common.sh 里的懒加载 stub
 export PATH="$HOME/bin:$PATH"

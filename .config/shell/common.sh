@@ -32,10 +32,18 @@ esac
 # ─── Claude Code provider switcher ───
 [[ -f ~/.config/shell/claude-providers.sh ]] && source ~/.config/shell/claude-providers.sh
 
-# ─── NVM ───
+# ─── NVM (lazy) ───
+# 第一次调用 nvm/node/npm/npx 时再 source nvm.sh
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+_load_nvm() {
+    unset -f nvm node npm npx _load_nvm
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+}
+nvm()  { _load_nvm; nvm "$@"; }
+node() { _load_nvm; node "$@"; }
+npm()  { _load_nvm; npm "$@"; }
+npx()  { _load_nvm; npx "$@"; }
 
 # ─── macOS ───
 export BASH_SILENCE_DEPRECATION_WARNING=1
@@ -48,9 +56,23 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 # ─── Proxy ───
 [[ -f ~/.config/shell/proxy.sh ]] && source ~/.config/shell/proxy.sh
 
-# ─── Conda ───
-# 各 shell 的 conda init 块不同（bash vs zsh），留在各自 rc 文件中。
-# 这里只做通用的环境激活。
-if command -v conda &>/dev/null; then
-    conda activate jsbsim 2>/dev/null
-fi
+# ─── Conda (lazy) ───
+# 第一次调用 conda 时再注入 shell hook（bash/zsh 各自不同）
+conda() {
+    unset -f conda
+    local __conda_setup __shell
+    if [ -n "${ZSH_VERSION:-}" ]; then
+        __shell=zsh
+    else
+        __shell=bash
+    fi
+    __conda_setup="$("$HOME/miniconda3/bin/conda" "shell.$__shell" "hook" 2>/dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="$HOME/miniconda3/bin:$PATH"
+    fi
+    conda "$@"
+}
