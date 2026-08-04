@@ -1,0 +1,18 @@
+date: YYYY-MM-DD
+presenter: 王俊博
+title: ""
+slides:
+  - type: cover
+  - type: idea
+    title: ""
+    sources: []
+  - type: progress
+    title: 本周工作进展
+    repos: []
+    since: ""
+  - type: next
+    title: 下周工作
+sources:
+  notes: []
+  zotero: []
+  assets: []
