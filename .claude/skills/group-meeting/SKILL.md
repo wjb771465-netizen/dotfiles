@@ -22,16 +22,19 @@ Shell commands that touch `officecli open` need **full permissions** (resident p
 
 ## Paths
 
+Skill root = `~/.claude/skills/group-meeting/`（下称 `$SKILL`）。脚本用 `$SKILL` 相对路径，不依赖 `~/KB`。
+
 | Item | Path |
 |------|------|
-| Template | `~/KB/group-meetings/组会模版.pptx` |
-| Session dir | `~/KB/group-meetings/<YYYY-MM-DD>/` |
-| Output | `~/KB/group-meetings/<YYYY-MM-DD>/组会<月>.<日>王俊博.pptx` |
-| Session manifest | `~/KB/group-meetings/<YYYY-MM-DD>/session.yaml` |
-| Assets / formulas | `~/KB/group-meetings/<YYYY-MM-DD>/assets/`（公式在 `assets/formulas/`） |
-| Formula script | `~/.claude/skills/group-meeting/scripts/latex_render.py`（vendored from ppt-master） |
+| Template | `$SKILL/ppt/组会模版.pptx`（**进 git**） |
+| Session dir | `$SKILL/ppt/<YYYY-MM-DD>/`（**gitignore**） |
+| Output | `$SKILL/ppt/<YYYY-MM-DD>/组会<月>.<日>王俊博.pptx` |
+| Session manifest | `$SKILL/ppt/<YYYY-MM-DD>/session.yaml` |
+| Assets / formulas | `$SKILL/ppt/<YYYY-MM-DD>/assets/`（公式在 `assets/formulas/`） |
+| Formula script | `$SKILL/scripts/latex_render.py`（vendored from ppt-master） |
 | Init / git / QA | `scripts/init_deck.sh` · `summarize_git.sh` · `qa_deck.sh` |
-| Session template | `~/.claude/skills/group-meeting/templates/session.yaml` |
+| Session template | `$SKILL/templates/session.yaml` |
+| KB 软链（可选） | `~/KB/group-meetings` → `$SKILL/ppt` |
 
 写 PPT 前 `Read` session 与其中列出的笔记；勿凭记忆编造。不确定处标 `needs-verify`。
 
@@ -55,7 +58,7 @@ Arc comes from **当次 `session.yaml`**, not a fixed slide list.
 ```bash
 bash ~/.claude/skills/group-meeting/scripts/init_deck.sh YYYY-MM-DD
 # prints FILE=... ; creates dir, copies template, writes session.yaml stub
-FILE=~/KB/group-meetings/YYYY-MM-DD/组会M.D王俊博.pptx
+FILE=$SKILL/ppt/YYYY-MM-DD/组会M.D王俊博.pptx
 # edit session.yaml (slides / sources / repos), then:
 officecli open "$FILE"
 ```
@@ -111,9 +114,9 @@ pptx 下 OfficeCLI 的 `--type equation` **不能**挂进 textbox，且单独点
 ```bash
 # 1) 写 manifest：assets/formulas/images/formula_manifest.json
 # 2) 渲染（用 ppt-master conda 的 python，系统 python3 常缺 Pillow）
-DIR=~/KB/group-meetings/YYYY-MM-DD
+DIR=$SKILL/ppt/YYYY-MM-DD
 /Users/wjb/miniconda3/envs/ppt-master/bin/python3 \
-  ~/.claude/skills/group-meeting/scripts/latex_render.py \
+  $SKILL/scripts/latex_render.py \
   "$DIR/assets/formulas"
 
 # 3) 插入：先 get --depth 1 定位置；高度按 PNG 宽高比 h = w * pixel_h / pixel_w

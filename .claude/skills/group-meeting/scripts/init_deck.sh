@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create ~/KB/group-meetings/<YYYY-MM-DD>/ with template copy + session.yaml stub.
+# Create <skill>/ppt/<YYYY-MM-DD>/ with template copy + session.yaml stub.
 set -euo pipefail
 
 DATE="${1:-}"
@@ -9,9 +9,9 @@ if [[ -z "$DATE" || ! "$DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
 fi
 
 SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-TEMPLATE="${HOME}/KB/group-meetings/组会模版.pptx"
-OUT_ROOT="${HOME}/KB/group-meetings"
-DIR="${OUT_ROOT}/${DATE}"
+PPT_DIR="${SKILL_DIR}/ppt"
+TEMPLATE="${PPT_DIR}/组会模版.pptx"
+DIR="${PPT_DIR}/${DATE}"
 
 if [[ ! -f "$TEMPLATE" ]]; then
   echo "Template not found: $TEMPLATE" >&2
