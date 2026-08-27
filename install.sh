@@ -61,6 +61,19 @@ case "$yn" in
     ;;
 esac
 
+# ─── Claude Code plugins (idempotent) ─────────────────────────────────────────
+
+PLUGINS=(
+  "frontend-design@claude-plugins-official"
+  "session-report@claude-plugins-official"
+)
+echo "==> Installing Claude Code plugins..."
+for p in "${PLUGINS[@]}"; do
+  claude plugin install "$p" >/dev/null 2>&1 \
+    && echo "    installed: $p" \
+    || echo "    skipped (already installed or claude unavailable): $p"
+done
+
 # ─── Optional: Cursor MCP servers (not installed by this script) ──────────────
 #
 # ~/.cursor/mcp.json 已包含 zotero / officecli 两个 MCP server 配置，但依赖以下

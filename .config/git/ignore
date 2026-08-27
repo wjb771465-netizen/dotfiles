@@ -46,3 +46,4 @@ env/
 
 **/.claude/settings.local.json
 claude-plans/
+.claude/settings.json
