@@ -21,8 +21,8 @@
 | `~/.cursor/permissions.json` | Cursor Agent 终端/MCP 白名单与 Auto-review 倾向 |
 | `~/.claude/settings.json` | Claude Code 通用配置 |
 | `~/.claude/CLAUDE.md` | Claude Code 用户级偏好（Cursor 不自动加载；见 workflow-prefs） |
-| `~/.claude/skills/context/` | context 技能（含 agent-layer 和 readme-layer prompts） |
-| `~/.claude/skills/git-commit-push/` | git-commit-push 技能（CC 与 Cursor 共用） |
+| `~/.agents/skills/` | 技能本体目录（cc-switch 统一存储） |
+| `~/.claude/skills/` | 技能软链，由 cc-switch 生成指向 `~/.agents/skills/` |
 | `~/.config/shell/keys.sh` | `key()` 函数，通过 pass 取 API key |
 | `~/.password-store/` | GPG 加密的密钥仓库（pass，独立 git repo） |
 | `~/.config/pass/` | GPG 密钥备份（dotfiles-private 跟踪） |
@@ -32,9 +32,21 @@
 - 日常管理用 `dotfiles` alias（= `git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME`）
 - 私有配置（`~/.dotfiles-private/`）独立管理，不进入此 repo
 - `git status` 默认隐藏未跟踪文件（`status.showUntrackedFiles no`）
-- 私人技能存放在 `~/.claude/skills/`，由 `dotfiles-private` 管理；Cursor 兼容扫描同一目录，无需复制到 `~/.cursor/skills/`
+- 私人技能（Ruby、Xiya 等）由 `dotfiles-private` 管理，公开技能由本仓管理，分工见下方「Skills 与插件管理」
 - Git 提交流程以 `git-commit-push` skill 为准，不要再维护平行的 Cursor git-commit rule
 - **API 密钥管理**：使用 `pass` + `$(key <name>)` 取值，禁止在配置文件或对话中写明文 key。三个仓库分工见 `pass-secrets-guide.md`
+
+## Skills 与插件管理
+
+**技能（skills）**：
+- 本体统一存放在 `~/.agents/skills/`，由 cc-switch 管理，软链分发到 `~/.claude/skills/` 等各 agent 目录
+- 编辑技能直接改 `~/.agents/skills/<name>/`，不要动 `~/.claude/skills/` 下的软链
+- **软链本身不进 git**（cc-switch 负责生成）；公开技能（无隐私内容）由本仓跟踪本体文件，私人技能由 `dotfiles-private` 跟踪
+- 少数技能未被 cc-switch 收录时仍是 `~/.claude/skills/` 实体目录，照常由对应仓跟踪
+
+**插件（plugins）**：
+- Claude Code 插件由 `install.sh` 的 `PLUGINS` 数组统一安装，装新插件时同步加进去
+- 插件安装状态由 Claude Code 自管（`claude plugin list`），不进 git
 
 ## Operational Constraints（bare repo 操作禁区）
 

@@ -66,6 +66,7 @@ esac
 PLUGINS=(
   "frontend-design@claude-plugins-official"
   "session-report@claude-plugins-official"
+  "skill-creator@claude-plugins-official"
 )
 echo "==> Installing Claude Code plugins..."
 for p in "${PLUGINS[@]}"; do
