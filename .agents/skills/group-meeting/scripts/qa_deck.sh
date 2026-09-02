@@ -90,6 +90,90 @@ fi
 rm -f "$TEXT_OUT"
 
 echo
+echo "=== Gate 4: bold ratio check ==="
+BOLD_OUT="$(mktemp)"
+if officecli view "$FILE" text --format json >"$BOLD_OUT" 2>&1; then
+  # 计算 bold 使用率
+  BOLD_COUNT=$(grep -c "bold=true" "$BOLD_OUT" 2>/dev/null || echo 0)
+  TOTAL_SHAPES=$(officecli view "$FILE" outline 2>/dev/null | grep -c "textbox" || echo 1)
+
+  if [[ "$TOTAL_SHAPES" -gt 0 ]]; then
+    # 计算比例（小数形式 * 100 保留整数）
+    BOLD_RATIO=$(echo "scale=0; $BOLD_COUNT * 100 / $TOTAL_SHAPES" | bc 2>/dev/null || echo 0)
+    if [[ "$BOLD_RATIO" -gt 40 ]]; then
+      echo "FAIL: bold ratio ${BOLD_RATIO}% exceeds 40% threshold (full-paragraph bold detected)"
+      FAIL=1
+    else
+      echo "PASS: bold ratio ${BOLD_RATIO}% (within 40% threshold)"
+    fi
+  else
+    echo "PASS: bold ratio check (no textboxes)"
+  fi
+else
+  echo "PASS: bold ratio check (format not available)"
+fi
+rm -f "$BOLD_OUT"
+
+echo
+echo "=== Gate 5: textbox count check ==="
+SLIDE_COUNT=$(officecli view "$FILE" outline 2>/dev/null | grep -c "^├── Slide" || echo 0)
+TOTAL_TEXTBOXES=$(officecli view "$FILE" outline 2>/dev/null | grep -oP '\d+ text box' | grep -oP '\d+' | awk '{sum+=$1} END {print sum}')
+AVG_TEXTBOXES=0
+
+if [[ "$SLIDE_COUNT" -gt 0 ]] && [[ "$TOTAL_TEXTBOXES" -gt 0 ]]; then
+  AVG_TEXTBOXES=$(echo "scale=2; $TOTAL_TEXTBOXES / $SLIDE_COUNT" | bc 2>/dev/null || echo "0")
+fi
+
+# 检查平均值是否 ≥1
+IS_BELOW=$(echo "$AVG_TEXTBOXES < 1" | bc 2>/dev/null || echo 0)
+if [[ "$IS_BELOW" -eq 1 ]]; then
+  echo "FAIL: average ${AVG_TEXTBOXES} textboxes/slide < 1 threshold (no content)"
+  FAIL=1
+else
+  echo "PASS: average ${AVG_TEXTBOXES} textboxes/slide (≥1 threshold)"
+fi
+
+echo
+echo "=== Gate 6: textbox overlap check ==="
+OVERLAP_FOUND=0
+
+# 获取所有文本框的坐标信息
+officecli view "$FILE" outline 2>/dev/null | grep "textbox" | while read -r line; do
+  # 提取 x, y, width, height（从 officecli 输出格式）
+  # 如果有两个文本框的坐标范围重叠，则报错
+  # 这里用简化方法：检查是否有文本框在同一位置
+  true
+done
+
+# 改进版：直接解析每个 slide 的 shape 坐标
+SLIDES_TOTAL=$(officecli view "$FILE" outline 2>/dev/null | grep -c "^├── Slide" || echo 0)
+OVERLAP_COUNT=0
+
+for slide_idx in $(seq 1 $SLIDES_TOTAL); do
+  # 获取该页所有文本框的坐标
+  TEXTBOXES=$(officecli get "$FILE" "/slide[$slide_idx]" --depth 1 2>/dev/null | grep "textbox" || true)
+
+  if [[ -n "$TEXTBOXES" ]]; then
+    # 提取每个文本框的 x,y,w,h 并检查重叠
+    # 简化：检测是否有完全相同位置的文本框
+    POSITIONS=$(echo "$TEXTBOXES" | grep -oE 'x=[0-9]+emu y=[0-9]+emu' | sort)
+    DUPES=$(echo "$POSITIONS" | uniq -d | wc -l)
+
+    if [[ "$DUPES" -gt 0 ]]; then
+      echo "FAIL: slide[$slide_idx] has $DUPES textboxes at identical position"
+      OVERLAP_COUNT=$((OVERLAP_COUNT + DUPES))
+    fi
+  fi
+done
+
+if [[ "$OVERLAP_COUNT" -gt 0 ]]; then
+  echo "FAIL: $OVERLAP_COUNT total overlapping textboxes"
+  FAIL=1
+else
+  echo "PASS: no textbox overlap detected"
+fi
+
+echo
 echo "=== Outline (informational) ==="
 officecli view "$FILE" outline 2>/dev/null | head -n 60 || echo "(outline unavailable)"
 

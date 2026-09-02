@@ -63,6 +63,27 @@ FILE=$SKILL/ppt/YYYY-MM-DD/组会M.D王俊博.pptx
 officecli open "$FILE"
 ```
 
+**Git 版本追踪：** 每个 session 目录初始化 git，每轮制作/修改 PPT 后提交：
+
+```bash
+cd $SKILL/ppt/YYYY-MM-DD
+git init
+echo "*.pptx" >> .gitignore  # PPT 文件太大，不进 git（或单独追踪）
+git add .
+git commit -m "v1: 初始创建"
+
+# 每轮修改后
+git add -A
+git commit -m "v2: 重构文本框布局"
+```
+
+回退机制：
+```bash
+git log --oneline           # 查看历史版本
+git stash                   # 临时回退
+git checkout <commit-id>    # 回退到指定版本
+```
+
 ### 2. Orient
 
 ```bash
