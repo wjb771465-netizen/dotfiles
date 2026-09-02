@@ -41,24 +41,21 @@ if ! officecli view "$FILE" issues >"$ISSUES_OUT" 2>&1; then
   echo "FAIL: view issues (command error)"
   FAIL=1
 else
-  COUNT="$(sed -nE 's/^Found ([0-9]+) issue\(s\):/\1/p' "$ISSUES_OUT" | head -1)"
+  COUNT="$(grep -m1 -oE 'Found[[:space:]]+[0-9]+[[:space:]]+issue' "$ISSUES_OUT" | grep -oE '[0-9]+' | head -1)"
   if [[ -z "$COUNT" ]]; then
-    # Fallback: any known issue tokens
-    if grep -Eiq 'OCLI_NOTEVAL|shape_off_slide|low_contrast|text overflow|Format Issues' "$ISSUES_OUT"; then
-      head -n 40 "$ISSUES_OUT"
-      echo "FAIL: issues reported"
-      FAIL=1
-    else
-      head -n 20 "$ISSUES_OUT"
-      echo "PASS: issues"
-    fi
-  elif [[ "$COUNT" -eq 0 ]]; then
-    echo "Found 0 issue(s)"
-    echo "PASS: issues"
-  else
+    # No "Found N issue(s)" header: infer from per-issue "[O1]" markers instead of a fixed token list
+    # (a fixed list drifts — off-slide and text-overflow wording changes; each entry is prefixed
+    # with a category-letter+number marker like "[O1]").
+    COUNT="$(grep -cE '\[[A-Za-z][0-9]+\]' "$ISSUES_OUT")"
+    COUNT="${COUNT:-0}"
+  fi
+  if [[ "$COUNT" -gt 0 ]]; then
     head -n 40 "$ISSUES_OUT"
     echo "FAIL: $COUNT issue(s)"
     FAIL=1
+  else
+    head -n 20 "$ISSUES_OUT"
+    echo "PASS: issues"
   fi
 fi
 rm -f "$ISSUES_OUT"

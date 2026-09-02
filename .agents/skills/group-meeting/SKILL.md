@@ -68,7 +68,7 @@ officecli open "$FILE"
 ```bash
 officecli view "$FILE" outline
 officecli view "$FILE" annotated
-officecli get "$FILE" "/slide[1]" --depth 1   # cover shape IDs
+officecli get "$FILE" "/slide[1]" --depth 1   # cover shape names / ids
 ```
 
 Template content slides use layout **`Blank Slide`**. Copy an existing content slide instead of `layout=blank`:
@@ -77,14 +77,23 @@ Template content slides use layout **`Blank Slide`**. Copy an existing content s
 officecli add "$FILE" / --type slide --from '/slide[2]' --index 2
 ```
 
+**Shape handle rule：** `id=` 每次 `add --from` 拷贝都会重排，**不可作锚**；`name=` 拷贝后保持稳定。用 `get --depth 1` 读出 shape 的 `name=` 字段，再以 `shape[@name="..."]` 定位。模板各页的稳定 name 见 §3（封面）、§4（标题/正文）、§5（页脚）。
+
 ### 3. Cover (slide 1)
 
-- Date: `/slide[1]/shape[@id=89]` → `YYYY.MM.DD`（与 session.date 一致）
-- Name: already in `/slide[1]/table[@id=88]` cell (王俊博)
+Cover shapes are located by `name=`, **not** `id=`（`id` 每次拷贝都会重排）。`get --depth 1` 先确认 name 再做 set：
+
+- Date: 定位**白色 20pt、文本形如 `2026.6.1`** 的 shape，改为 `YYYY.MM.DD`（与 session.date 一致）。模板里通常即 `/slide[1]/shape[@name="CustomShape 4"]`（`get --depth 1` 确认后再 set，勿信死 id）。
+- Name: `/slide[1]/table[@name="Table 3"]` cell 已是 王俊博
 
 ### 4. Fill content slides
 
-Reuse copied slide title/body textboxes (`shape[@id=5]` title, `shape[@id=2]` body on template slide 2; IDs differ on copied slides — always `get --depth 1` first).
+Reuse copied slide title/body textboxes by stable **`name=`**（`id` 随每次 `add --from` 重排，不可作锚；`name=` 复制后保持不变）。模板两栏内容页：
+
+- Title: `shape[@name="文本框 4"]`（28pt bold）
+- Body: `shape[@name="文本框 1"]`（18pt）
+
+`get --depth 1` 读 shape 的 `name=` 字段确认；自己新建的框也要起名（见下），别名后即可用 `name=` 定位。
 
 **Typography**
 
@@ -147,7 +156,7 @@ bash ~/.claude/skills/group-meeting/scripts/summarize_git.sh ~/Workspace/SomeRep
 
 ### 5. Footer fields
 
-模板内容页页脚已是纯文本 `FooterDate` / `FooterPage`（Arial 10.5pt bold），**不要**再引入 PowerPoint `<a:fld>`。拷贝内容页后：
+模板内容页页脚已是纯文本 `FooterDate` / `FooterPage`（Arial 10.5pt bold），**不要**再引入 PowerPoint `<a:fld>`。用 `shape[@name="FooterDate"]` / `shape[@name="FooterPage"]` 定位（name 稳定，id 会变）。拷贝内容页后：
 
 - 把 `FooterDate` 改成当次 `YYYY.MM.DD`
 - 把 `FooterPage` 改成实际页码
