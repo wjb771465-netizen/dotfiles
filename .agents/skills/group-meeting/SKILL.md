@@ -203,13 +203,9 @@ Prefer Zotero notes over paraphrasing abstracts. Mark uncertain items `needs-ver
 bash ~/.claude/skills/group-meeting/scripts/qa_deck.sh "$FILE"
 ```
 
-**视觉门（脚本不代替）：** 按官方 `pptx` skill Gate 3 看截图/svg；缺 Chrome 时用：
+**视觉核验（人工）：** 视觉门已降级为人工——**不**跑截图/svg 渲染（多模态耗时长）。交付前由人在 PowerPoint 里逐页过一遍溢出/重叠/深底深字/美观。判据以 `qa_deck.sh` 机械门为准。
 
-```bash
-officecli view "$FILE" svg --start N --end N
-```
-
-交付 = `qa_deck.sh` PASS **且** 视觉检查收敛，然后：
+交付 = `qa_deck.sh` PASS，然后：
 
 ```bash
 officecli save "$FILE"
