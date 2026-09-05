@@ -2,6 +2,11 @@
 
 项目级 CLAUDE.md 管技术细节，这里只管交互方式和思维模式。
 
+## 网络搜索
+
+网络搜索不要用自带工具，统一走 Tavily（`tvly` CLI / tavily-search 等 skills）。
+注：部分中转不支持内置 WebSearch/WebFetch，此时改用 Tavily MCP（`claude mcp add tavily-remote-mcp --transport http https://mcp.tavily.com/mcp/`）。
+
 ## Session 命名
 
 前 2-3 轮对话后，用 `/rename` 自动命名当前 session，格式 `[动词] [主题]`（如 "fix auth middleware"、"add session rename rule"），不超过 50 字符，不需要确认。主题发生明显偏移时，session 结束前更新一次。

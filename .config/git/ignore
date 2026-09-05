@@ -47,3 +47,15 @@ env/
 **/.claude/settings.local.json
 claude-plans/
 .claude/settings.json
+
+# === Tavily (暂不进仓：技能含 8 个子目录较复杂，中转不兼容 WebSearch 场景另议) ===
+.tavily/
+.agents/skills/tavily-*/
+.claude/skills/tavily-*/
+
+# === officecli skills (暂不进仓) ===
+.agents/skills/officecli/
+.agents/skills/officecli-pptx/
+
+# === Office 锁文件 / 临时文件 ===
+~$*
