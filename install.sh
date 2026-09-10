@@ -75,6 +75,18 @@ for p in "${PLUGINS[@]}"; do
     || echo "    skipped (already installed or claude unavailable): $p"
 done
 
+# ─── Cursor editor settings (draft → app path, one-way copy) ──────────────────
+# 草稿 ~/.config/cursor/settings.json 是 source of truth；在 Cursor UI 里改完
+# 设置后需手动回灌：cp "$HOME/Library/Application Support/Cursor/User/settings.json" ~/.config/cursor/settings.json
+
+CURSOR_SETTINGS="$HOME/Library/Application Support/Cursor/User/settings.json"
+if [ "$(uname)" = "Darwin" ] && [ -d "$(dirname "$CURSOR_SETTINGS")" ]; then
+  echo "==> Deploying Cursor settings..."
+  cp "$HOME/.config/cursor/settings.json" "$CURSOR_SETTINGS"
+else
+  echo "==> Skipping Cursor settings (Cursor app dir not found)."
+fi
+
 # ─── Optional: Cursor MCP servers (not installed by this script) ──────────────
 #
 # ~/.cursor/mcp.json 已包含 zotero / officecli 两个 MCP server 配置，但依赖以下
