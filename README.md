@@ -2,6 +2,12 @@
 
 个人开发环境配置，使用 [bare git repo](https://www.atlassian.com/git/tutorials/dotfiles) 方案管理。
 
+## 分支模型
+
+- **`main`** — macOS（zsh）+ Linux（bash）。本 README 的 bash/zsh 两节属于它。
+- **`windows`** — Windows（PowerShell 5.1 / 7），从 main 分出，两者共享历史。它**删掉了** unix-only 文件（`.bashrc`/`.zshrc`/`.profile`/`.agents/**`/`.local/**`/`install.sh`/`.config/shell/**` 等），所以 clone 下来落地到 `%USERPROFILE%` 的东西就是 Windows 该有的那些，不需要 sparse 之类的过滤。跨平台文件（`.gitconfig`、`.claude/CLAUDE.md`、`.cursor/rules/**`）两个分支共用同一份 blob。
+- main 的改动用 `dotfiles-sync` 并进来（见下）。
+
 ## 包含什么
 
 ### Shell（bash + zsh 双支持）
@@ -22,6 +28,13 @@
 - **`.config/bash/ps1_short_dir_git.sh`** — bash 独立 prompt 脚本
 - **`.profile`** — login shell 基础配置
 - **`.bash_logout`** — shell 退出清屏
+
+### PowerShell（Windows）
+
+- **`.config/powershell/common.ps1`** — 别名/函数（`ll`/`la`/`l`、`dotfiles`/`dotfiles-pull`）、`$HOME\.local\bin` PATH、绿用户名+蓝目录+白 git 分支的 prompt、PSReadLine 上下键前缀搜历史
+- **`.config/powershell/proxy.ps1`** — `proxy {on|off|status|auto}`，TCP 探测 127.0.0.1:7892（Clash），起 shell 时执行 `proxy auto`
+- **`.config/powershell/profile.ps1`** — profile shim 模板（`# >>> dotfiles >>>` 标记块，由 install.ps1 合并进真实 profile）
+- **`install.ps1`** — Windows 安装脚本（bare repo + sparse 白名单 + profile 合并）
 
 ### Git
 
@@ -90,6 +103,23 @@ source ~/.zshrc   # macOS
 
 </details>
 
+### Windows（PowerShell）
+
+```powershell
+git clone --bare --single-branch --branch windows https://github.com/wjb771465-netizen/dotfiles.git $HOME\.dotfiles
+powershell -NoProfile -ExecutionPolicy Bypass -File $HOME\install.ps1
+```
+
+Windows 用 `windows` 分支，同样是 bare repo + work-tree=`$HOME`（remote 走 HTTPS + Git Credential Manager）：
+
+- **落地范围由分支本身决定**：clone 的是 `windows` 分支，它的树里只有该出现在 `%USERPROFILE%` 的文件（`.config/powershell/**`、`install.ps1`、`.gitattributes`，加上跨平台的 `.gitconfig`/`.config/git/ignore`/`.claude/CLAUDE.md`/`.cursor/**`/`README.md`/`.dotfiles/CLAUDE.md`），所以没有 sparse 过滤，也不需要 `--single-branch` 之外的裁剪。unix-only 文件在分支的删除提交里，永远不会被 checkout 出来。
+- **profile 入口由 install.ps1 合并生成**（保留 conda 的 `#region conda initialize`）：`Documents\WindowsPowerShell\profile.ps1`（PS 5.1）与 `Documents\PowerShell\profile.ps1`（PS7）。这两个文件不在 git 里，**改配置请改 `~/.config/powershell/*.ps1` 后重跑 install.ps1**。
+- install.ps1 会先把与分支内容不同、会挡住 checkout 的本地文件挪进 `~/.dotfiles-backup\`，再 checkout，然后用 `checkout-index -a -f` 补齐（`checkout` 会把"文件不存在"当成你自己的删除而跳过）。
+- 机器本地 git 覆盖项放 `~/.config/git/config.local`（untracked，由 `.gitconfig` 末尾的 `[include]` 引入）。
+- **不要在 Windows 上 `dotfiles checkout main`**：main 的树里有 unix 文件，checkout 会把它们写进 `%USERPROFILE%`。clone 用了 `--single-branch`，本地没有 main 分支。
+- 不要在 Windows 上跑 `install.sh`（SSH remote + GNU sed）。
+- Windows 的 provider 切换归 cc-switch，`claude-providers.sh` 不移植；密钥链路（pass + `key()`）仍只在 macOS/Linux 侧。
+
 ### 日常管理
 
 ```bash
@@ -97,4 +127,6 @@ dotfiles status
 dotfiles add ~/.claude/settings.json
 dotfiles commit -m "update cc settings"
 dotfiles push
+dotfiles-pull   # 拉本分支（windows）的更新
+dotfiles-sync   # Windows：把 main 的改动并进来，并删掉随之带出的 unix-only 文件
 ```

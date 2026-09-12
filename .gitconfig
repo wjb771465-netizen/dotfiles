@@ -31,3 +31,6 @@
 
 [pull]
     rebase = true
+
+[include]
+	path = ~/.config/git/config.local

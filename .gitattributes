@@ -1,0 +1,2 @@
+# Keep the PowerShell scripts LF in the repo; they are authored ASCII-only.
+*.ps1 text eol=lf
