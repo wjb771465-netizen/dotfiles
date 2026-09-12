@@ -32,18 +32,25 @@ esac
 # ─── Claude Code provider switcher ───
 [[ -f ~/.config/shell/claude-providers.sh ]] && source ~/.config/shell/claude-providers.sh
 
-# ─── NVM (lazy) ───
-# 第一次调用 nvm/node/npm/npx 时再 source nvm.sh
+# ─── NVM ───
+# 不用懒加载 wrapper:_load_nvm 会被 ZCode/Claude Code 的 shell 快照过滤掉（下划线函数），
+# agent shell 里 node/npm 会因此递归报错；且 nvm 加载前 PATH 看不到全局命令（如 happy）。
+# 本机只用一个 node 版本，直接进 PATH；nvm 升级/换版本后记得同步这里的版本号。
 export NVM_DIR="$HOME/.nvm"
-_load_nvm() {
-    unset -f nvm node npm npx _load_nvm
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+if [ -d "$NVM_DIR/versions/node/v24.16.0/bin" ]; then
+    export PATH="$NVM_DIR/versions/node/v24.16.0/bin:$PATH"
+fi
+# nvm 命令本身按需加载 nvm.sh（nvm 只有函数、没有可执行文件，必须 source）
+nvm() {
+    if [ -s "$NVM_DIR/nvm.sh" ]; then
+        . "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+        nvm "$@"
+    else
+        echo "nvm: 未找到 $NVM_DIR/nvm.sh" >&2
+        return 1
+    fi
 }
-nvm()  { _load_nvm; nvm "$@"; }
-node() { _load_nvm; node "$@"; }
-npm()  { _load_nvm; npm "$@"; }
-npx()  { _load_nvm; npx "$@"; }
 
 # ─── macOS ───
 export BASH_SILENCE_DEPRECATION_WARNING=1
