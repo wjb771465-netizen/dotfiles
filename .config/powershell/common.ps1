@@ -64,12 +64,21 @@ function dotfiles-sync {
 $dotfilesBin = Join-Path $HOME '.local\bin'
 if ($env:PATH -notlike "*$dotfilesBin*") { $env:PATH = "$dotfilesBin;$env:PATH" }
 
+# Git for Windows can be installed "Git Bash only", which leaves git.exe off the
+# machine PATH. The dotfiles helpers and the prompt below both shell out to git.
+$gitBin = 'C:\Program Files\Git\cmd'
+if ((Test-Path "$gitBin\git.exe") -and ($env:PATH -notlike "*$gitBin*")) {
+    $env:PATH = "$gitBin;$env:PATH"
+}
+
 # Prompt: green user, blue leaf dir, white git branch (ps1_short_dir_git.sh).
 function prompt {
     $branch = ''
     $b = git rev-parse --abbrev-ref HEAD 2>$null
     if ($LASTEXITCODE -eq 0 -and $b) { $branch = " ($b)" }
     $leaf = Split-Path -Leaf (Get-Location)
+    # At a drive root (C:\) Split-Path -Leaf returns nothing; show the full path.
+    if (-not $leaf) { $leaf = (Get-Location).Path }
     Write-Host ("{0}[01;32m{1}{0}[00m:{0}[01;34m{2}{0}[00m{0}[37m{3}{0}[00m$ " -f [char]27, $env:USERNAME, $leaf, $branch) -NoNewline
     return ' '
 }
