@@ -1,2 +1,5 @@
 # Keep the PowerShell scripts LF in the repo; they are authored ASCII-only.
 *.ps1 text eol=lf
+# Skill scripts are run by bash (Git Bash on Windows); CRLF breaks them, and
+# the machine-local core.autocrlf=true would otherwise check them out as CRLF.
+*.sh text eol=lf
