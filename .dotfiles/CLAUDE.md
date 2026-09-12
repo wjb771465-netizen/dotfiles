@@ -82,6 +82,7 @@ Windows 用**独立分支** `windows`：它是 main 的子集 + Windows 专属�
 - 新增 `.ps1` **必须纯 ASCII 注释/文本**：Windows PowerShell 5.1 对无 BOM 的 `.ps1` 按 ANSI(cp936) 解析，中文会乱码甚至吞掉换行导致语法错误。`.gitattributes` 把 `*.ps1` 钉成 LF。
 - 机器本地差异（`safe.directory`、Windows 的 `core.autocrlf=true`）放 `~/.config/git/config.local`，不要写进 tracked 的 `.gitconfig`（那会让它在 `dotfiles status` 里长期 dirty）。
 - 不在 Windows 上跑 `install.sh`（SSH remote + GNU `sed -i`）；`.claude/hooks/**` 刻意不带（guard 依赖 `python3`，本机是 Store stub，fail-closed 会让每次工具调用都弹权限）。
+- Windows 上 git 访问 GitHub 走代理：`proxy auto`（profile 加载时执行）导出的 `HTTPS_PROXY=http://127.0.0.1:7892`。**不带代理时 `fetch`/`push` 会以 `Connection was reset` 或长时间挂起收场**，看起来像认证问题，其实不是（仓库是公开的，读不需要凭据）。
 - provider 切换归 cc-switch（`~/.cc-switch`），**不要**在 Windows 上移植 `claude-providers.sh`；密钥链路（pass + `key()`）目前只在 macOS/Linux 侧，Windows 的 `.claude/settings.json` 里是明文 key（本地文件，gitignored）。
 
 ## Tech Stack
