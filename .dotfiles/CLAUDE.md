@@ -22,12 +22,12 @@
 | `~/.claude/settings.json` | Claude Code 通用配置 |
 | `~/.claude/CLAUDE.md` | Claude Code 用户级偏好（Cursor 不自动加载；见 workflow-prefs） |
 | `~/.agents/skills/` | 技能本体目录（cc-switch 统一存储） |
-| `~/.claude/skills/` | 技能软链，由 cc-switch 生成指向 `~/.agents/skills/` |
+| `~/.claude/skills/` | 技能软链，由 cc-switch 生成指向 `~/.agents/skills/`（Windows 侧同路径，链接同样归 cc-switch） |
 | `~/.config/shell/keys.sh` | `key()` 函数，通过 pass 取 API key |
 | `~/.password-store/` | GPG 加密的密钥仓库（pass，独立 git repo） |
 | `~/.config/pass/` | GPG 密钥备份（dotfiles-private 跟踪） |
 | `~/docs/pass-secrets-guide.md` | pass 密钥管理完整指南 |
-| `~/install.ps1` | Windows 安装脚本（bare repo + sparse 白名单 + profile 合并） |
+| `~/install.ps1` | Windows 安装脚本（bare repo + checkout + profile 合并） |
 | `~/.config/powershell/common.ps1` | PowerShell 别名/函数/PATH/prompt |
 | `~/.config/powershell/proxy.ps1` | PowerShell 代理开关（探测 127.0.0.1:7892） |
 | `~/.config/powershell/profile.ps1` | profile shim 模板（`# >>> dotfiles >>>` 标记块） |
@@ -73,13 +73,14 @@
 
 Windows 用**独立分支** `windows`：它是 main 的子集 + Windows 专属文件，落地范围由分支的树本身决定，不用 sparse：
 
-- **分支内容**：`windows` 从 main 分出，共享历史，多加一个「删掉 unix-only 文件」的提交（`.bashrc`/`.bash_logout`/`.bashrc` 系列/`.profile`/`.zshrc`/`install.sh`/`.agents/**`/`.local/**`/`.config/shell/**`/`.config/bash/**`/`.config/cursor/**`/`.claude/hooks/**`/`.cursor/mcp.json`）。不落地这些是硬要求：Git Bash 会读 `~/.bashrc`，且 MSYS 的 `/etc/profile.d/bash_profile.sh` 检测到它会自动生成 `~/.bash_profile` 并打 WARNING。
-- **`windows` 上的文件**：`.config/powershell/{common,proxy,profile}.ps1`、`install.ps1`、`.gitattributes`，加上跨平台共用的 `.gitconfig`、`.config/git/ignore`、`.claude/CLAUDE.md`、`.cursor/{.gitignore,permissions.json,rules/**}`、`README.md`、`.dotfiles/CLAUDE.md`。Windows 侧要新增文件 → 加在这个分支上；要改跨平台文件 → 改哪个分支都行，但两边都改会在 `dotfiles-sync` 时冲突。
+- **分支内容**：`windows` 从 main 分出，共享历史，多加一个「删掉 unix-only 文件」的提交（`.bashrc`/`.bash_logout`/`.bashrc` 系列/`.profile`/`.zshrc`/`install.sh`/`.local/**`/`.config/shell/**`/`.config/bash/**`/`.config/cursor/**`/`.claude/hooks/**`/`.cursor/mcp.json`）。不落地这些是硬要求：Git Bash 会读 `~/.bashrc`，且 MSYS 的 `/etc/profile.d/bash_profile.sh` 检测到它会自动生成 `~/.bash_profile` 并打 WARNING。
+- **`windows` 上的文件**：`.config/powershell/{common,proxy,profile}.ps1`、`install.ps1`、`.gitattributes`、`.agents/skills/**`，加上跨平台共用的 `.gitconfig`、`.config/git/ignore`、`.claude/CLAUDE.md`、`.cursor/{.gitignore,permissions.json,rules/**}`、`README.md`、`.dotfiles/CLAUDE.md`。Windows 侧要新增文件 → 加在这个分支上；要改跨平台文件 → 改哪个分支都行，但两边都改会在 `dotfiles-sync` 时冲突。
+- **技能**：本体在 `.agents/skills/**`，与 main 是同一批路径，所以两分支共享 blob，main 上改技能能被 `dotfiles-sync` 直接带过来。`~/.claude/skills/<name>` 那层链接由 cc-switch 生成（本机是 `D:\wjb\CC-Switch-*` 便携版，本体在不同目录时以它的设施为准），**链接不进 git，也不要手改**。
 - **落地的机制**：`git clone --bare --single-branch --branch windows`（本地只有 `windows` 分支，避免误 checkout main 把 unix 文件泼进 `$HOME`）+ `install.ps1`。git 2.51 的 `clone --bare` 不写 `remote.origin.fetch`，install.ps1 会补上 `+refs/heads/*:refs/remotes/origin/*`，否则 `dotfiles fetch` 是空操作、`origin/main` 不存在。
-- **install.ps1 的顺序**：`ls-tree HEAD` 预扫描（clone 后 index 还是空的，只有 HEAD 可查）→ 与 HEAD 不同的本地文件挪进 `~/.dotfiles-backup\`（比较用 `git hash-object --path=<rel>`，走 CRLF 归一化）→ `checkout` → **`checkout-index -a -f`**。最后这步不能省：`checkout` 把「worktree 里文件不存在」当成你自己的删除而跳过，被挪走的文件和手删的文件都靠它补回来。
-- **更新**：`dotfiles-pull` = `fetch` + `merge --ff-only origin/windows`。**同步 main** 用 `dotfiles-sync`：`merge --no-edit origin/main` 会因 modify/delete 冲突停下（main 改过、本分支删过的文件会被写回 `$HOME`），脚本按 `diff --diff-filter=U`（冲突）和 `--cached --diff-filter=A`（main 新增）挑出 unix-only 路径，`rm -f` 掉再 `commit`。`-X ours` **不能**自动解决 modify/delete 冲突。
+- **install.ps1 的顺序**：`ls-tree HEAD` 预扫描（clone 后 index 还是空的，只有 HEAD 可查）→ 与 HEAD 不同的本地文件挪进 `~/.dotfiles-backup\`（比较用 `git hash-object --path=<rel>`，走 CRLF 归一化）→ `checkout` → **`checkout-index -a -f`**。最后这步不能省：`checkout` 把「worktree 里文件不存在」当成你自己的删除而跳过，被挪走的文件和手删的文件都靠它补回来。（注意 `checkout-index -f` 对 stat 与 index 一致的**已存在**文件不重写：改完 `.gitattributes` 的 eol 后要让 git 重写旧文件，得先删掉它，或直接 `git cat-file blob :<path> > <path>`。）
+- **更新**：`dotfiles-pull` = `fetch` + `merge --ff-only origin/windows`。**同步 main** 用 `dotfiles-sync`：`merge --no-edit origin/main` 会因 modify/delete 冲突停下（main 改过、本分支删过的文件会被写回 `$HOME`），脚本按 `diff --diff-filter=U`（冲突）和 `--cached --diff-filter=A`（main 新增）挑出 unix-only 路径，`rm -f` 掉再 `commit`。`-X ours` **不能**自动解决 modify/delete 冲突。名单在 `common.ps1` 的 `$DotfilesUnixOnly`；`.agents` 已从中移除（技能不是 unix-only，两边同路径），否则 main 上新增的技能会被当成 unix-only 删掉。
 - profile 入口（`Documents\...\profile.ps1`）由 `install.ps1` 合并生成，保留 conda 的 `#region conda initialize` 块。改配置改 `~/.config/powershell/*.ps1`（或 `profile.ps1` 模板）后重跑 `install.ps1`，不要手改 Documents 下那两个文件。
-- 新增 `.ps1` **必须纯 ASCII 注释/文本**：Windows PowerShell 5.1 对无 BOM 的 `.ps1` 按 ANSI(cp936) 解析，中文会乱码甚至吞掉换行导致语法错误。`.gitattributes` 把 `*.ps1` 钉成 LF。
+- 新增 `.ps1` **必须纯 ASCII 注释/文本**：Windows PowerShell 5.1 对无 BOM 的 `.ps1` 按 ANSI(cp936) 解析，中文会乱码甚至吞掉换行导致语法错误。`.gitattributes` 把 `*.ps1` 钉成 LF。skill 的 `scripts/*.sh` 也钉了 LF：本机 `core.autocrlf=true` 会把它检出成 CRLF，Git Bash 执行时报 `\r` 错。
 - 机器本地差异（`safe.directory`、Windows 的 `core.autocrlf=true`）放 `~/.config/git/config.local`，不要写进 tracked 的 `.gitconfig`（那会让它在 `dotfiles status` 里长期 dirty）。
 - 不在 Windows 上跑 `install.sh`（SSH remote + GNU `sed -i`）；`.claude/hooks/**` 刻意不带（guard 依赖 `python3`，本机是 Store stub，fail-closed 会让每次工具调用都弹权限）。
 - Windows 上 git 访问 GitHub 走代理：`proxy auto`（profile 加载时执行）导出的 `HTTPS_PROXY=http://127.0.0.1:7892`。**不带代理时 `fetch`/`push` 会以 `Connection was reset` 或长时间挂起收场**，看起来像认证问题，其实不是（仓库是公开的，读不需要凭据）。

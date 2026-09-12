@@ -16,10 +16,11 @@ function dotfiles { git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" @args }
 
 # Paths that live on main (macOS/Linux) but have no business in $HOME here. The
 # windows branch tracks none of them; they only show up when a merge from main
-# writes them back, which `dotfiles-sync` undoes.
+# writes them back, which `dotfiles-sync` undoes. `.agents/skills` is absent on
+# purpose: the skill bodies are tracked on both branches at the same paths.
 $DotfilesUnixOnly = @(
     '.bashrc', '.bash_logout', '.bash_login', '.bash_aliases', '.inputrc',
-    '.profile', '.zshrc', 'install.sh', '.agents', '.local',
+    '.profile', '.zshrc', 'install.sh', '.local',
     '.claude/hooks', '.cursor/mcp.json', '.config/bash', '.config/cursor', '.config/shell'
 )
 
