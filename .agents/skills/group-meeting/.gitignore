@@ -1,3 +1,3 @@
-# Session decks / assets (template stays tracked)
-ppt/[0-9][0-9][0-9][0-9]-*/
-ppt/.DS_Store
+# Everything under ppt/ is runtime output (session dirs, decks, ~$ lock files) — not tracked.
+# Templates stay tracked under templates/.
+ppt/*
