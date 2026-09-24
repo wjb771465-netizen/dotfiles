@@ -9,6 +9,24 @@ alias l='ls -CF'
 alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias dotfiles-private='git --git-dir=$HOME/.dotfiles-private/ --work-tree=$HOME'
 
+# ─── Codex CLI session shortcuts ───
+# Keep the usual `codex ...` commands intact while matching Claude Code's -r/-c.
+codex() {
+    case "${1:-}" in
+        -r)
+            shift
+            command codex resume "$@"
+            ;;
+        -c)
+            shift
+            command codex resume --last "$@"
+            ;;
+        *)
+            command codex "$@"
+            ;;
+    esac
+}
+
 # ls/grep 彩色输出（跨平台）
 if command -v dircolors &>/dev/null; then
     eval "$(dircolors -b)"
