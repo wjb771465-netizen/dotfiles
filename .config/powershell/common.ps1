@@ -11,6 +11,22 @@ function ll { Get-ChildItem -Force @args }
 function la { Get-ChildItem -Force @args }
 function l  { Get-ChildItem @args }
 
+# Codex session shortcuts (mirror of common.sh's codex()): `codex -r` resumes,
+# `codex -c` resumes the last session; everything else passes through.
+function codex {
+    $a = @($args)
+    # npm also ships an extensionless shim; `&` can't run it, so prefer the .cmd.
+    $exe = Get-Command codex -All -CommandType Application -ErrorAction Stop |
+        Where-Object Extension | Select-Object -First 1
+    if ($a.Count -gt 0 -and $a[0] -eq '-r') {
+        & $exe resume @($a | Select-Object -Skip 1)
+    } elseif ($a.Count -gt 0 -and $a[0] -eq '-c') {
+        & $exe resume --last @($a | Select-Object -Skip 1)
+    } else {
+        & $exe @a
+    }
+}
+
 # dotfiles management (bash alias `dotfiles` on macOS/Linux).
 function dotfiles { git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" @args }
 
